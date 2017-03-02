@@ -30,9 +30,11 @@ public class MovieCollector {
         JSONArray jsonarray = (JSONArray) jsonObject.get("results");
         KLog.d(jsonarray.size());
 
-        for (Object jsonMovie: jsonarray) {
+        for (Object jsonMovie : jsonarray) {
             JSONObject podcastJson = (JSONObject) jsonMovie;
-            movieList.add(getMovie(podcastJson));
+            Movie movie = getMovie(podcastJson);
+            if (movie != null)
+                movieList.add(movie);
         }
 
         return movieList;
@@ -43,12 +45,12 @@ public class MovieCollector {
 
         movie.setOriginalTitle(jsonObject.get("original_title").toString());
         movie.setOverview(jsonObject.get("overview").toString());
-        movie.setPosterImageUrl(imageUrlCore +jsonObject.get("poster_path"));
-        movie.setPosterImageUrl(imageUrlCore +jsonObject.get("poster_path"));
+        movie.setPosterImageUrl(imageUrlCore + jsonObject.get("poster_path"));
+        movie.setPosterImageUrl(imageUrlCore + jsonObject.get("poster_path"));
         movie.setReleaseDate(jsonObject.get("release_date").toString());
         movie.setUserRating(Float.parseFloat(jsonObject.get("vote_average").toString()));
 
-        return null;
+        return movie;
     }
 
     private static String getResponseFromHttpUrl(String url) throws Throwable {

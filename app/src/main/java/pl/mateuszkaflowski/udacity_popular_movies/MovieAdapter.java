@@ -1,30 +1,67 @@
 package pl.mateuszkaflowski.udacity_popular_movies;
 
+import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
+import com.socks.library.KLog;
+import com.squareup.picasso.Picasso;
+
+import java.util.List;
+
+import pl.mateuszkaflowski.udacity_popular_movies.moviedata.Movie;
+
 public class MovieAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+
+    private List<Movie> movieList;
+    private LayoutInflater inflater;
+    private Context context;
+    private ClickCallback clickCallback;
+
+    public MovieAdapter(Context context, List<Movie> movieList) {
+        inflater = LayoutInflater.from(context);
+
+        this.context = context;
+        this.movieList = movieList;
+
+        KLog.d(movieList.size());
+    }
+
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        LayoutInflater inflater = LayoutInflater.from(parent.getContext());
-        View view = inflater.inflate(R.layout.movie_list_item,parent,false);
+        View view = inflater.inflate(R.layout.movie_list_item, parent, false);
         return new MovieViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
 
+
+        MovieViewHolder movieHolder = (MovieViewHolder) holder;
+        Movie movie = movieList.get(position);
+
+        KLog.d(movie.getPosterImageUrl());
+        Picasso.with(context).load(movie.getPosterImageUrl()).into(movieHolder.poster);
+        //Picasso.with(context).load(R.mipmap.ic_launcher).into(movieHolder.poster);
     }
 
     @Override
     public int getItemCount() {
-        return 0;
+        return movieList.size();
     }
 
-    private class MovieViewHolder extends RecyclerView.ViewHolder{
+    public void setClickCallback(ClickCallback clickCallback) {
+        this.clickCallback = clickCallback;
+    }
+
+    public interface ClickCallback {
+        void itemClick(View view, int position);
+    }
+
+    private class MovieViewHolder extends RecyclerView.ViewHolder {
 
         private ImageView poster;
 
