@@ -17,12 +17,35 @@ public class MovieCollector {
 
     private static final String imageUrlCore = "https://image.tmdb.org/t/p/w500/";
 
-    public static List<Movie> getPopularMovies() throws Throwable {
+    public static List<Movie> getPopularMovies(final String API_KEY) throws Throwable {
         List<Movie> movieList = new ArrayList<>();
 
         JSONParser parser = new JSONParser();
 
-        String address = "https://api.themoviedb.org/3/discover/movie?sort_by=popularity.desc&api_key=8a62f5601df1b9f0ded3ae998c87b433";
+        String address = "https://api.themoviedb.org/3/movie/popular?api_key="+API_KEY;
+        Object obj = parser.parse(getResponseFromHttpUrl(address));
+
+        JSONObject jsonObject = (JSONObject) obj;
+
+        JSONArray jsonarray = (JSONArray) jsonObject.get("results");
+        KLog.d(jsonarray.size());
+
+        for (Object jsonMovie : jsonarray) {
+            JSONObject podcastJson = (JSONObject) jsonMovie;
+            Movie movie = getMovie(podcastJson);
+            if (movie != null)
+                movieList.add(movie);
+        }
+
+        return movieList;
+    }
+
+    public static List<Movie> getTopRatedMovies(final String API_KEY) throws Throwable {
+        List<Movie> movieList = new ArrayList<>();
+
+        JSONParser parser = new JSONParser();
+
+        String address = "https://api.themoviedb.org/3/movie/top_rated?api_key="+API_KEY;
         Object obj = parser.parse(getResponseFromHttpUrl(address));
 
         JSONObject jsonObject = (JSONObject) obj;

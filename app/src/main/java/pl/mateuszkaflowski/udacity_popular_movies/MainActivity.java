@@ -44,7 +44,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected List<Movie> doInBackground(Void... voids) {
             try {
-                List<Movie> movies = MovieCollector.getPopularMovies();
+                List<Movie> movies = MovieCollector.getPopularMovies(CommonConstants.API_KEY);
                 return movies;
             } catch (Throwable throwable) {
                 throwable.printStackTrace();
