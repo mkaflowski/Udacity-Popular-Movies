@@ -27,7 +27,6 @@ public class MovieAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         this.context = context;
         this.movieList = movieList;
 
-        KLog.d(movieList.size());
     }
 
     @Override
@@ -43,7 +42,6 @@ public class MovieAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         MovieViewHolder movieHolder = (MovieViewHolder) holder;
         Movie movie = movieList.get(position);
 
-        KLog.d(movie.getPosterImageUrl());
         Picasso.with(context).load(movie.getPosterImageUrl()).into(movieHolder.poster);
         //Picasso.with(context).load(R.mipmap.ic_launcher).into(movieHolder.poster);
     }
