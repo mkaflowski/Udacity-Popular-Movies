@@ -1,10 +1,16 @@
 package pl.mateuszkaflowski.udacity_popular_movies;
 
+import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 
+import com.socks.library.KLog;
+
+import java.util.List;
+
+import pl.mateuszkaflowski.udacity_popular_movies.moviedata.Movie;
 import pl.mateuszkaflowski.udacity_popular_movies.moviedata.MovieCollector;
 
 public class MainActivity extends AppCompatActivity {
@@ -17,18 +23,28 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         recyclerView = (RecyclerView) findViewById(R.id.menuRecyclerView);
-        recyclerView.setLayoutManager(new GridLayoutManager(this,4));
+        recyclerView.setLayoutManager(new GridLayoutManager(this, 4));
 
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    MovieCollector.getPopularMovies();
-                } catch (Throwable throwable) {
-                    throwable.printStackTrace();
-                }
-            }
-        }).start();
-
+        CollectMovieInfoAsyncTask collectTask = new CollectMovieInfoAsyncTask();
+        collectTask.execute();
     }
+
+    private class CollectMovieInfoAsyncTask extends AsyncTask<Void, Void, List<Movie>> {
+
+        @Override
+        protected List<Movie> doInBackground(Void... voids) {
+            try {
+                return MovieCollector.getPopularMovies();
+            } catch (Throwable throwable) {
+                throwable.printStackTrace();
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(List<Movie> movies) {
+            KLog.d(movies.size());
+        }
+    }
+
 }

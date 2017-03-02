@@ -23,7 +23,7 @@ public class MovieCollector {
         JSONParser parser = new JSONParser();
 
         String address = "https://api.themoviedb.org/3/discover/movie?sort_by=popularity.desc&api_key=8a62f5601df1b9f0ded3ae998c87b433";
-        Object obj = parser.parse(getTextFromUrl(address));
+        Object obj = parser.parse(getResponseFromHttpUrl(address));
 
         JSONObject jsonObject = (JSONObject) obj;
 
@@ -41,7 +41,6 @@ public class MovieCollector {
     private static Movie getMovie(JSONObject jsonObject) {
         Movie movie = new Movie();
 
-
         movie.setOriginalTitle(jsonObject.get("original_title").toString());
         movie.setOverview(jsonObject.get("overview").toString());
         movie.setPosterImageUrl(imageUrlCore +jsonObject.get("poster_path"));
@@ -52,7 +51,7 @@ public class MovieCollector {
         return null;
     }
 
-    private static String getTextFromUrl(String url) throws Throwable {
+    private static String getResponseFromHttpUrl(String url) throws Throwable {
         URL website = new URL(url);
         URLConnection connection = website.openConnection();
         BufferedReader in = new BufferedReader(
