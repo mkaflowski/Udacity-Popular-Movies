@@ -43,7 +43,6 @@ public class MovieAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         Movie movie = movieList.get(position);
 
         Picasso.with(context).load(movie.getPosterImageUrl()).into(movieHolder.poster);
-        //Picasso.with(context).load(R.mipmap.ic_launcher).into(movieHolder.poster);
     }
 
     @Override
@@ -59,13 +58,20 @@ public class MovieAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         void itemClick(View view, int position);
     }
 
-    private class MovieViewHolder extends RecyclerView.ViewHolder {
+    private class MovieViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         private ImageView poster;
 
         public MovieViewHolder(View itemView) {
             super(itemView);
             poster = (ImageView) itemView.findViewById(R.id.poster);
+            poster.setOnClickListener(this);
+        }
+
+        @Override
+        public void onClick(View view) {
+            if(clickCallback!=null)
+                clickCallback.itemClick(view,getAdapterPosition());
         }
     }
 }

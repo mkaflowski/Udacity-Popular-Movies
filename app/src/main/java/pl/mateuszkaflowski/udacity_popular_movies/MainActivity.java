@@ -1,5 +1,6 @@
 package pl.mateuszkaflowski.udacity_popular_movies;
 
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -7,6 +8,7 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Toast;
 
 import com.socks.library.KLog;
@@ -18,10 +20,14 @@ import java.util.List;
 import pl.mateuszkaflowski.udacity_popular_movies.moviedata.Movie;
 import pl.mateuszkaflowski.udacity_popular_movies.moviedata.MovieCollector;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements MovieAdapter.ClickCallback {
 
     public static final String POPULAR_IDENTIFIER = "POPULAR";
     public static final String TOP_RATED_IDENTIFIER = "TOP_RATED";
+
+    // TODO: repleace api key
+    private static final String API_KEY = CommonConstants.API_KEY;
+
     private RecyclerView recyclerView;
     private MovieAdapter movieAdapter;
     private List<Movie> movieList;
@@ -37,6 +43,7 @@ public class MainActivity extends AppCompatActivity {
 
         movieList = new ArrayList<>();
         movieAdapter = new MovieAdapter(this, movieList);
+        movieAdapter.setClickCallback(this);
 
         recyclerView.setAdapter(movieAdapter);
 
@@ -66,13 +73,21 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    public void itemClick(View view, int position) {
+        Intent intent = new Intent(this,DetailActivity.class);
+        Movie movie = movieList.get(position);
+        intent.putExtra(DetailActivity.MOVIE_EXTRA, movie);
+        startActivity(intent);
+    }
+
     private class CollectMovieInfoAsyncTask extends AsyncTask<String, Void, List<Movie>> {
 
         @Override
         protected List<Movie> doInBackground(String... strings) {
             if (strings[0].equals(POPULAR_IDENTIFIER)) {
                 try {
-                    List<Movie> movies = MovieCollector.getPopularMovies(CommonConstants.API_KEY);
+                    List<Movie> movies = MovieCollector.getPopularMovies(API_KEY);
                     return movies;
                 } catch (Throwable throwable) {
                     throwable.printStackTrace();
@@ -81,7 +96,7 @@ public class MainActivity extends AppCompatActivity {
 
             if (strings[0].equals(TOP_RATED_IDENTIFIER)) {
                 try {
-                    List<Movie> movies = MovieCollector.getTopRatedMovies(CommonConstants.API_KEY);
+                    List<Movie> movies = MovieCollector.getTopRatedMovies(API_KEY);
                     return movies;
                 } catch (Throwable throwable) {
                     throwable.printStackTrace();
