@@ -27,10 +27,12 @@ dependencies {
 
 
     compile files('libs/json-simple-1.1.jar')
-    compile 'com.android.support:appcompat-v7:25.1.0'
-    compile 'com.android.support:recyclerview-v7:25.1.0'
+    compile 'com.android.support:appcompat-v7:25.3.0'
+    compile 'com.android.support:recyclerview-v7:25.3.0'
     compile 'com.github.zhaokaiqiang.klog:library:1.6.0'
     compile 'com.squareup.picasso:picasso:2.5.2'
-    compile 'com.android.support:design:25.1.0'
+    compile 'com.android.support:design:25.3.0'
+    compile 'com.jakewharton:butterknife:8.4.0'
+    annotationProcessor 'com.jakewharton:butterknife-compiler:8.4.0'
     testCompile 'junit:junit:4.12'
 }

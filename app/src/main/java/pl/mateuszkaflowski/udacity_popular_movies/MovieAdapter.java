@@ -7,7 +7,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
-import com.socks.library.KLog;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
