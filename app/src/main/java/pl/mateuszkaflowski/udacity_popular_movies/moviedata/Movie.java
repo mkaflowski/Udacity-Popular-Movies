@@ -10,6 +10,7 @@ public class Movie implements Parcelable {
     private String overview;
     private float userRating;
     private String releaseDate;
+    private String id;
 
     protected Movie(Parcel in) {
         originalTitle = in.readString();
@@ -17,6 +18,17 @@ public class Movie implements Parcelable {
         overview = in.readString();
         userRating = in.readFloat();
         releaseDate = in.readString();
+        id = in.readString();
+    }
+
+    @Override
+    public void writeToParcel(Parcel parcel, int i) {
+        parcel.writeString(originalTitle);
+        parcel.writeString(posterImageUrl);
+        parcel.writeString(overview);
+        parcel.writeFloat(userRating);
+        parcel.writeString(releaseDate);
+        parcel.writeString(id);
     }
 
     public Movie() {
@@ -75,17 +87,21 @@ public class Movie implements Parcelable {
         this.releaseDate = releaseDate;
     }
 
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
     @Override
     public int describeContents() {
         return 0;
     }
 
     @Override
-    public void writeToParcel(Parcel parcel, int i) {
-        parcel.writeString(originalTitle);
-        parcel.writeString(posterImageUrl);
-        parcel.writeString(overview);
-        parcel.writeFloat(userRating);
-        parcel.writeString(releaseDate);
+    public String toString() {
+        return getOriginalTitle() + " - "+getId();
     }
 }

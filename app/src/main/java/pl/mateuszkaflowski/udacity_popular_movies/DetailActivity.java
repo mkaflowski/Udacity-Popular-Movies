@@ -3,11 +3,11 @@ package pl.mateuszkaflowski.udacity_popular_movies;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.ActivityOptionsCompat;
-import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.AsyncTaskLoader;
+import android.support.v4.content.Loader;
 import android.support.v4.view.ViewCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -15,24 +15,36 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.socks.library.KLog;
 import com.squareup.picasso.Picasso;
+
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import pl.mateuszkaflowski.udacity_popular_movies.moviedata.Movie;
+import pl.mateuszkaflowski.udacity_popular_movies.moviedata.MovieCollector;
+import pl.mateuszkaflowski.udacity_popular_movies.moviedata.Trailer;
 
-public class DetailActivity extends AppCompatActivity {
+public class DetailActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<List<Trailer>> {
 
     public static final String MOVIE_EXTRA = "MOVIE_EXTRA";
     public static final String EXTRA_IMAGE = "EXTRA_IMAGE:image";
 
+    private int LOADER_ID = 127;
+
     private Movie movie;
 
-    @BindView(R.id.tvTitle) TextView tvTitle;
-    @BindView(R.id.tvDate) TextView tvDate;
-    @BindView(R.id.tvRate) TextView tvRate;
-    @BindView(R.id.tvOverview) TextView tvOverview;
-    @BindView(R.id.ivPoster) ImageView ivPoster;
+    @BindView(R.id.tvTitle)
+    TextView tvTitle;
+    @BindView(R.id.tvDate)
+    TextView tvDate;
+    @BindView(R.id.tvRate)
+    TextView tvRate;
+    @BindView(R.id.tvOverview)
+    TextView tvOverview;
+    @BindView(R.id.ivPoster)
+    ImageView ivPoster;
 
 
     @Override
@@ -49,6 +61,12 @@ public class DetailActivity extends AppCompatActivity {
         setTitle(movie.getOriginalTitle());
 
         initilizeViews();
+
+        Bundle bundle = new Bundle();
+        bundle.putParcelable(MOVIE_EXTRA, movie);
+
+        LoaderManager loaderManager = getSupportLoaderManager();
+        loaderManager.initLoader(LOADER_ID, bundle, this);
     }
 
     private void initilizeViews() {
@@ -68,4 +86,49 @@ public class DetailActivity extends AppCompatActivity {
         ActivityCompat.startActivity(activity, intent, options.toBundle());
     }
 
+    @Override
+    public Loader<List<Trailer>> onCreateLoader(int id, final Bundle args) {
+        return new AsyncTaskLoader<List<Trailer>>(this) {
+            @Override
+            protected void onStartLoading() {
+                super.onStartLoading();
+                KLog.i("onStartLoading");
+                forceLoad();
+            }
+
+            @Override
+            public List<Trailer> loadInBackground() {
+                KLog.i("loadInBackground");
+
+                try {
+                    List<Trailer> trailers = MovieCollector.getTrailers(CommonConstants.API_KEY, (Movie) args.getParcelable(MOVIE_EXTRA));
+                    KLog.i("onLoadFinished");
+                    for (Trailer trailer : trailers) {
+                        KLog.i(trailer.getKey());
+                    }
+                    return trailers;
+                } catch (Throwable throwable) {
+                    throwable.printStackTrace();
+                }
+
+                return null;
+            }
+
+        };
+    }
+
+
+    @Override
+    public void onLoadFinished(Loader<List<Trailer>> loader, List<Trailer> data) {
+//        KLog.i("onLoadFinished");
+//        for (Trailer trailer : data) {
+//            KLog.i(trailer.getKey());
+//        }
+    }
+
+
+    @Override
+    public void onLoaderReset(Loader loader) {
+
+    }
 }

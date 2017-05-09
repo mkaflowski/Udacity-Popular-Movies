@@ -69,11 +69,46 @@ public class MovieCollector {
         movie.setOriginalTitle(jsonObject.get("original_title").toString());
         movie.setOverview(jsonObject.get("overview").toString());
         movie.setPosterImageUrl(imageUrlCore + jsonObject.get("poster_path"));
-        movie.setPosterImageUrl(imageUrlCore + jsonObject.get("poster_path"));
+        movie.setId(jsonObject.get("id").toString());
         movie.setReleaseDate(jsonObject.get("release_date").toString());
         movie.setUserRating(Float.parseFloat(jsonObject.get("vote_average").toString()));
 
         return movie;
+    }
+
+    public static List<Trailer> getTrailers(final String API_KEY, Movie movie) throws Throwable {
+        List<Trailer> trailerList = new ArrayList<>();
+
+        JSONParser parser = new JSONParser();
+
+        String address = "https://api.themoviedb.org/3/movie/"+movie.getId()+"/videos?api_key="+API_KEY;
+        Object obj = parser.parse(getResponseFromHttpUrl(address));
+
+        JSONObject jsonObject = (JSONObject) obj;
+
+        JSONArray jsonArray = (JSONArray) jsonObject.get("results");
+        KLog.d(jsonArray.size());
+
+        for (Object jsonTrailer : jsonArray) {
+            JSONObject jsonObj = (JSONObject) jsonTrailer;
+            Trailer trailer = getTrailer(jsonObj);
+            if (movie != null)
+                trailerList.add(trailer);
+        }
+
+        return trailerList;
+    }
+
+    private static Trailer getTrailer(JSONObject jsonObject) {
+        Trailer trailer = new Trailer();
+
+        trailer.setId(jsonObject.get("id").toString());
+        trailer.setIso(jsonObject.get("iso_3166_1").toString());
+        trailer.setKey(jsonObject.get("key").toString());
+        trailer.setName(jsonObject.get("name").toString());
+        trailer.setType(jsonObject.get("type").toString());
+
+        return trailer;
     }
 
     private static String getResponseFromHttpUrl(String url) throws Throwable {
