@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.design.widget.BottomSheetBehavior;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.app.LoaderManager;
@@ -11,6 +12,7 @@ import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.Loader;
 import android.support.v4.view.ViewCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -28,9 +30,10 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import pl.mateuszkaflowski.udacity_popular_movies.moviedata.Movie;
 import pl.mateuszkaflowski.udacity_popular_movies.moviedata.MovieCollector;
+import pl.mateuszkaflowski.udacity_popular_movies.moviedata.Review;
 import pl.mateuszkaflowski.udacity_popular_movies.moviedata.Trailer;
 
-public class DetailActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<List<Trailer>>, TrailerAdapter.ClickCallback {
+public class DetailActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks, TrailerAdapter.ClickCallback {
 
     public static final String MOVIE_EXTRA = "MOVIE_EXTRA";
     public static final String EXTRA_IMAGE = "EXTRA_IMAGE:image";
@@ -38,7 +41,6 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
     private int LOADER_ID = 127;
 
     private Movie movie;
-    private TrailerAdapter trailerAdapter;
 
 
     @BindView(R.id.tvTitle)
@@ -53,6 +55,8 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
     ImageView ivPoster;
     @BindView(R.id.trailerRecyclerView)
     RecyclerView rvTrailers;
+    @BindView(R.id.reviewRecyclerView)
+    RecyclerView rvReviews;
 
 
     @Override
@@ -76,7 +80,17 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
         LoaderManager loaderManager = getSupportLoaderManager();
         loaderManager.initLoader(LOADER_ID, bundle, this);
 
-        rvTrailers.setLayoutManager(new LinearLayoutManager(this));
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+        rvTrailers.setLayoutManager(layoutManager);
+        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(rvTrailers.getContext(),
+                layoutManager.getOrientation());
+        rvTrailers.addItemDecoration(dividerItemDecoration);
+
+        LinearLayoutManager layoutManager2 = new LinearLayoutManager(this);
+        rvReviews.setLayoutManager(layoutManager2);
+        dividerItemDecoration = new DividerItemDecoration(rvReviews.getContext(),
+                layoutManager2.getOrientation());
+        rvReviews.addItemDecoration(dividerItemDecoration);
     }
 
     private void initilizeViews() {
@@ -97,8 +111,8 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
     }
 
     @Override
-    public Loader<List<Trailer>> onCreateLoader(int id, final Bundle args) {
-        return new AsyncTaskLoader<List<Trailer>>(this) {
+    public Loader onCreateLoader(int id, final Bundle args) {
+        return new AsyncTaskLoader(this) {
             @Override
             protected void onStartLoading() {
                 super.onStartLoading();
@@ -107,12 +121,14 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
             }
 
             @Override
-            public List<Trailer> loadInBackground() {
+            public List<Object> loadInBackground() {
                 KLog.i("loadInBackground");
 
                 try {
-                    List<Trailer> trailers = MovieCollector.getTrailers(CommonConstants.API_KEY, (Movie) args.getParcelable(MOVIE_EXTRA));
-                    return trailers;
+                    List<Object> res = new ArrayList<>();
+                    res.add(MovieCollector.getTrailers(CommonConstants.API_KEY, (Movie) args.getParcelable(MOVIE_EXTRA)));
+                    res.add(MovieCollector.getReviews(CommonConstants.API_KEY, (Movie) args.getParcelable(MOVIE_EXTRA)));
+                    return res;
                 } catch (Throwable throwable) {
                     throwable.printStackTrace();
                 }
@@ -125,14 +141,18 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
 
 
     @Override
-    public void onLoadFinished(Loader<List<Trailer>> loader, List<Trailer> data) {
+    public void onLoadFinished(Loader loader, Object data) {
         KLog.i("onLoadFinished");
-        for (Trailer trailer : data) {
-            KLog.i(trailer.getKey());
-        }
-        trailerAdapter = new TrailerAdapter(data);
+        List<Object> res = (List<Object>) data;
+
+        List<Trailer> trailers = (List<Trailer>) res.get(0);
+        TrailerAdapter trailerAdapter = new TrailerAdapter(trailers);
         rvTrailers.setAdapter(trailerAdapter);
         trailerAdapter.setClickCallback(this);
+
+        List<Review> reviews = (List<Review>) res.get(1);
+        ReviewAdapter reviewAdapter = new ReviewAdapter(reviews);
+        rvReviews.setAdapter(reviewAdapter);
     }
 
 

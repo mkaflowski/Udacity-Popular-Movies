@@ -92,11 +92,43 @@ public class MovieCollector {
         for (Object jsonTrailer : jsonArray) {
             JSONObject jsonObj = (JSONObject) jsonTrailer;
             Trailer trailer = getTrailer(jsonObj);
-            if (movie != null)
+            if (trailer != null)
                 trailerList.add(trailer);
         }
 
         return trailerList;
+    }
+
+    public static List<Review> getReviews(final String API_KEY, Movie movie) throws Throwable {
+        List<Review> reviews = new ArrayList<>();
+
+        JSONParser parser = new JSONParser();
+
+        String address = "https://api.themoviedb.org/3/movie/"+movie.getId()+"/reviews?api_key="+API_KEY;
+        Object obj = parser.parse(getResponseFromHttpUrl(address));
+
+        JSONObject jsonObject = (JSONObject) obj;
+
+        JSONArray jsonArray = (JSONArray) jsonObject.get("results");
+        KLog.d(jsonArray.size());
+
+        for (Object jsonTrailer : jsonArray) {
+            JSONObject jsonObj = (JSONObject) jsonTrailer;
+            Review review = getReview(jsonObj);
+            if (review != null)
+                reviews.add(review);
+        }
+
+        return reviews;
+    }
+
+    private static Review getReview(JSONObject jsonObj) {
+        Review review = new Review();
+
+        review.setAuthor(jsonObj.get("author").toString());
+        review.setContent(jsonObj.get("content").toString());
+
+        return review;
     }
 
     private static Trailer getTrailer(JSONObject jsonObject) {
