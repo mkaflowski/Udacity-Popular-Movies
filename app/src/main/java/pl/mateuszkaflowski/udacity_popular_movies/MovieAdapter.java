@@ -25,7 +25,6 @@ public class MovieAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
 
         this.context = context;
         this.movieList = movieList;
-
     }
 
     @Override
@@ -36,8 +35,6 @@ public class MovieAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
-
-
         MovieViewHolder movieHolder = (MovieViewHolder) holder;
         Movie movie = movieList.get(position);
 

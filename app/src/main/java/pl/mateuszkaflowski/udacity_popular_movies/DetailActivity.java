@@ -2,6 +2,7 @@ package pl.mateuszkaflowski.udacity_popular_movies;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.ActivityOptionsCompat;
@@ -10,6 +11,8 @@ import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.Loader;
 import android.support.v4.view.ViewCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.ImageView;
@@ -18,6 +21,7 @@ import android.widget.TextView;
 import com.socks.library.KLog;
 import com.squareup.picasso.Picasso;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
@@ -26,7 +30,7 @@ import pl.mateuszkaflowski.udacity_popular_movies.moviedata.Movie;
 import pl.mateuszkaflowski.udacity_popular_movies.moviedata.MovieCollector;
 import pl.mateuszkaflowski.udacity_popular_movies.moviedata.Trailer;
 
-public class DetailActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<List<Trailer>> {
+public class DetailActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<List<Trailer>>, TrailerAdapter.ClickCallback {
 
     public static final String MOVIE_EXTRA = "MOVIE_EXTRA";
     public static final String EXTRA_IMAGE = "EXTRA_IMAGE:image";
@@ -34,6 +38,8 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
     private int LOADER_ID = 127;
 
     private Movie movie;
+    private TrailerAdapter trailerAdapter;
+
 
     @BindView(R.id.tvTitle)
     TextView tvTitle;
@@ -45,6 +51,8 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
     TextView tvOverview;
     @BindView(R.id.ivPoster)
     ImageView ivPoster;
+    @BindView(R.id.trailerRecyclerView)
+    RecyclerView rvTrailers;
 
 
     @Override
@@ -67,6 +75,8 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
 
         LoaderManager loaderManager = getSupportLoaderManager();
         loaderManager.initLoader(LOADER_ID, bundle, this);
+
+        rvTrailers.setLayoutManager(new LinearLayoutManager(this));
     }
 
     private void initilizeViews() {
@@ -102,10 +112,6 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
 
                 try {
                     List<Trailer> trailers = MovieCollector.getTrailers(CommonConstants.API_KEY, (Movie) args.getParcelable(MOVIE_EXTRA));
-                    KLog.i("onLoadFinished");
-                    for (Trailer trailer : trailers) {
-                        KLog.i(trailer.getKey());
-                    }
                     return trailers;
                 } catch (Throwable throwable) {
                     throwable.printStackTrace();
@@ -120,15 +126,24 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
 
     @Override
     public void onLoadFinished(Loader<List<Trailer>> loader, List<Trailer> data) {
-//        KLog.i("onLoadFinished");
-//        for (Trailer trailer : data) {
-//            KLog.i(trailer.getKey());
-//        }
+        KLog.i("onLoadFinished");
+        for (Trailer trailer : data) {
+            KLog.i(trailer.getKey());
+        }
+        trailerAdapter = new TrailerAdapter(data);
+        rvTrailers.setAdapter(trailerAdapter);
+        trailerAdapter.setClickCallback(this);
     }
 
 
     @Override
     public void onLoaderReset(Loader loader) {
+
+    }
+
+    @Override
+    public void itemClick(View view, int position, Trailer trailer) {
+        startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(trailer.getYoutubeLink())));
 
     }
 }

@@ -53,6 +53,6 @@ public class Trailer {
     }
 
     public String getYoutubeLink(){
-        return "https://www.youtube.com/watch?v=SUXWAEX2jlg"+key;
+        return "https://www.youtube.com/watch?v="+key;
     }
 }
