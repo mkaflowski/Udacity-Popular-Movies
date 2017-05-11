@@ -10,4 +10,8 @@
         android:id="@+id/menuTopRated"
         android:actionViewClass="android.support.v7.widget.SearchView"
         android:title="Top rated" />
+    <item
+        android:id="@+id/menuFavourite"
+        android:actionViewClass="android.support.v7.widget.SearchView"
+        android:title="Favourite" />
 </menu>

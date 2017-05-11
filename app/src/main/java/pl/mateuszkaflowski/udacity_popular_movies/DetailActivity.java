@@ -22,6 +22,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.socks.library.KLog;
 import com.squareup.picasso.Picasso;
@@ -31,6 +32,7 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import pl.mateuszkaflowski.udacity_popular_movies.moviedata.FavContract;
 import pl.mateuszkaflowski.udacity_popular_movies.moviedata.FavDataSource;
 import pl.mateuszkaflowski.udacity_popular_movies.moviedata.FavMoviesDbHelper;
 import pl.mateuszkaflowski.udacity_popular_movies.moviedata.Movie;
@@ -63,7 +65,6 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
     RecyclerView rvReviews;
     @BindView(R.id.btFav)
     Button btFav;
-    private FavDataSource favDataSource;
 
 
     @Override
@@ -101,7 +102,6 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
 
         btFav.setOnClickListener(this);
 
-        favDataSource = new FavDataSource(this);
     }
 
     private void initilizeViews() {
@@ -181,13 +181,20 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
 
     @Override
     public void onClick(View v) {
-        switch (v.getId()){
+        switch (v.getId()) {
             case R.id.btFav:
                 KLog.d("Adding to database");
-                favDataSource.open();
-                favDataSource.insertMovie(movie);
-                favDataSource.getAllMovies();
-                favDataSource.close();
+                ContentValues contentValues = new ContentValues();
+                contentValues.put(FavMoviesDbHelper.COLUMN_TITLE, movie.getOriginalTitle());
+                contentValues.put(FavMoviesDbHelper.COLUMN_TMDB_ID, movie.getId());
+                contentValues.put(FavMoviesDbHelper.COLUMN_DATE, movie.getReleaseDate());
+                contentValues.put(FavMoviesDbHelper.COLUMN_OVERVIEW, movie.getOverview());
+                contentValues.put(FavMoviesDbHelper.COLUMN_POSTER, movie.getPosterImageUrl());
+                contentValues.put(FavMoviesDbHelper.COLUMN_RATING, movie.getUserRating());
+
+                Uri uri = getContentResolver().insert(FavContract.Fav.CONTENT_URI, contentValues);
+                if (uri != null)
+                    KLog.d(uri.toString());
                 break;
         }
     }

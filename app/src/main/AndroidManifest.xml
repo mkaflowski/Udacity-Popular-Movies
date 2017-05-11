@@ -20,7 +20,11 @@
         <activity
             android:name=".DetailActivity"
             android:label="@string/title_activity_detail"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:theme="@style/AppTheme.NoActionBar" />
+        <provider
+            android:name=".moviedata.FavContentProvider"
+            android:authorities="pl.mateuszkaflowski.udacity_popular_movies"
+            android:exported="false"/>
     </application>
 
 </manifest>

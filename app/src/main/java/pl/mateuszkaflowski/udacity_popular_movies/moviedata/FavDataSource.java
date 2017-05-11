@@ -16,7 +16,7 @@ public class FavDataSource {
     private SQLiteDatabase database;
     private FavMoviesDbHelper dbHelper;
 
-    private String[] allColumns = {FavMoviesDbHelper.COLUMN_TITLE,
+    public static String[] allColumns = {FavMoviesDbHelper.COLUMN_TITLE,
             FavMoviesDbHelper.COLUMN_DATE,
             FavMoviesDbHelper.COLUMN_RATING,
             FavMoviesDbHelper.COLUMN_OVERVIEW,
