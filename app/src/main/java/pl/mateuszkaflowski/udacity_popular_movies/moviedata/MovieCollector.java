@@ -71,7 +71,7 @@ public class MovieCollector {
         movie.setPosterImageUrl(imageUrlCore + jsonObject.get("poster_path"));
         movie.setId(jsonObject.get("id").toString());
         movie.setReleaseDate(jsonObject.get("release_date").toString());
-        movie.setUserRating(Float.parseFloat(jsonObject.get("vote_average").toString()));
+        movie.setUserRating(jsonObject.get("vote_average").toString());
 
         return movie;
     }

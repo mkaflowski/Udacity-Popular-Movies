@@ -1,10 +1,12 @@
 package pl.mateuszkaflowski.udacity_popular_movies;
 
 import android.app.Activity;
+import android.content.ContentValues;
 import android.content.Intent;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.design.widget.BottomSheetBehavior;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.app.LoaderManager;
@@ -17,6 +19,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -28,12 +31,14 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import pl.mateuszkaflowski.udacity_popular_movies.moviedata.FavDataSource;
+import pl.mateuszkaflowski.udacity_popular_movies.moviedata.FavMoviesDbHelper;
 import pl.mateuszkaflowski.udacity_popular_movies.moviedata.Movie;
 import pl.mateuszkaflowski.udacity_popular_movies.moviedata.MovieCollector;
 import pl.mateuszkaflowski.udacity_popular_movies.moviedata.Review;
 import pl.mateuszkaflowski.udacity_popular_movies.moviedata.Trailer;
 
-public class DetailActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks, TrailerAdapter.ClickCallback {
+public class DetailActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks, TrailerAdapter.ClickCallback, View.OnClickListener {
 
     public static final String MOVIE_EXTRA = "MOVIE_EXTRA";
     public static final String EXTRA_IMAGE = "EXTRA_IMAGE:image";
@@ -41,7 +46,6 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
     private int LOADER_ID = 127;
 
     private Movie movie;
-
 
     @BindView(R.id.tvTitle)
     TextView tvTitle;
@@ -57,6 +61,9 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
     RecyclerView rvTrailers;
     @BindView(R.id.reviewRecyclerView)
     RecyclerView rvReviews;
+    @BindView(R.id.btFav)
+    Button btFav;
+    private FavDataSource favDataSource;
 
 
     @Override
@@ -91,13 +98,17 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
         dividerItemDecoration = new DividerItemDecoration(rvReviews.getContext(),
                 layoutManager2.getOrientation());
         rvReviews.addItemDecoration(dividerItemDecoration);
+
+        btFav.setOnClickListener(this);
+
+        favDataSource = new FavDataSource(this);
     }
 
     private void initilizeViews() {
 
         tvTitle.setText(movie.getOriginalTitle());
         tvDate.setText(movie.getReleaseDate());
-        tvRate.setText(Float.toString(movie.getUserRating()) + " / 10");
+        tvRate.setText(movie.getUserRating() + " / 10");
         tvOverview.setText(movie.getOverview());
 
         Picasso.with(this).load(movie.getPosterImageUrl()).noFade().into(ivPoster);
@@ -153,6 +164,7 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
         List<Review> reviews = (List<Review>) res.get(1);
         ReviewAdapter reviewAdapter = new ReviewAdapter(reviews);
         rvReviews.setAdapter(reviewAdapter);
+
     }
 
 
@@ -165,5 +177,18 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
     public void itemClick(View view, int position, Trailer trailer) {
         startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(trailer.getYoutubeLink())));
 
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()){
+            case R.id.btFav:
+                KLog.d("Adding to database");
+                favDataSource.open();
+                favDataSource.insertMovie(movie);
+                favDataSource.getAllMovies();
+                favDataSource.close();
+                break;
+        }
     }
 }

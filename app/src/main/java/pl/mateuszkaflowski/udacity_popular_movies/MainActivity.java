@@ -1,6 +1,7 @@
 package pl.mateuszkaflowski.udacity_popular_movies;
 
 import android.content.Intent;
+import android.database.sqlite.SQLiteDatabase;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
@@ -15,6 +16,7 @@ import com.socks.library.KLog;
 import java.util.ArrayList;
 import java.util.List;
 
+import pl.mateuszkaflowski.udacity_popular_movies.moviedata.FavMoviesDbHelper;
 import pl.mateuszkaflowski.udacity_popular_movies.moviedata.Movie;
 
 public class MainActivity extends AppCompatActivity implements MovieAdapter.ClickCallback, CollectMovieInfoAsyncTask.OnMovieCollectedCallback {
@@ -26,6 +28,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Clic
     private MovieAdapter movieAdapter;
     private List<Movie> movieList;
     private CollectMovieInfoAsyncTask collectTask;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,6 +47,8 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Clic
         collectTask = new CollectMovieInfoAsyncTask();
         collectTask.setOnMovieCollectedCallback(this);
         collectTask.execute(POPULAR_IDENTIFIER);
+
+        FavMoviesDbHelper dbHelper = new FavMoviesDbHelper(this);
     }
 
     @Override
