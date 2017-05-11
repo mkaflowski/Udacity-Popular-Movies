@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
@@ -22,7 +21,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.socks.library.KLog;
 import com.squareup.picasso.Picasso;
@@ -66,6 +64,8 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
     @BindView(R.id.btFav)
     Button btFav;
 
+    boolean isFavourite;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -102,6 +102,14 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
 
         btFav.setOnClickListener(this);
 
+        String where = FavMoviesDbHelper.COLUMN_TMDB_ID + " = ?";
+        String[] whereArgs = new String[]{movie.getId()};
+        Cursor cursor = getContentResolver().query(FavContract.Fav.CONTENT_URI, FavDataSource.allColumns, where, whereArgs, null);
+        if (cursor.getCount() > 0)
+            isFavourite = true;
+
+        if(isFavourite)
+            btFav.setText(R.string.remove_favourite);
     }
 
     private void initilizeViews() {
@@ -183,18 +191,27 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.btFav:
-                KLog.d("Adding to database");
-                ContentValues contentValues = new ContentValues();
-                contentValues.put(FavMoviesDbHelper.COLUMN_TITLE, movie.getOriginalTitle());
-                contentValues.put(FavMoviesDbHelper.COLUMN_TMDB_ID, movie.getId());
-                contentValues.put(FavMoviesDbHelper.COLUMN_DATE, movie.getReleaseDate());
-                contentValues.put(FavMoviesDbHelper.COLUMN_OVERVIEW, movie.getOverview());
-                contentValues.put(FavMoviesDbHelper.COLUMN_POSTER, movie.getPosterImageUrl());
-                contentValues.put(FavMoviesDbHelper.COLUMN_RATING, movie.getUserRating());
+                if(!isFavourite) {
+                    KLog.d("Adding to database");
+                    ContentValues contentValues = new ContentValues();
+                    contentValues.put(FavMoviesDbHelper.COLUMN_TITLE, movie.getOriginalTitle());
+                    contentValues.put(FavMoviesDbHelper.COLUMN_TMDB_ID, movie.getId());
+                    contentValues.put(FavMoviesDbHelper.COLUMN_DATE, movie.getReleaseDate());
+                    contentValues.put(FavMoviesDbHelper.COLUMN_OVERVIEW, movie.getOverview());
+                    contentValues.put(FavMoviesDbHelper.COLUMN_POSTER, movie.getPosterImageUrl());
+                    contentValues.put(FavMoviesDbHelper.COLUMN_RATING, movie.getUserRating());
 
-                Uri uri = getContentResolver().insert(FavContract.Fav.CONTENT_URI, contentValues);
-                if (uri != null)
-                    KLog.d(uri.toString());
+                    Uri uri = getContentResolver().insert(FavContract.Fav.CONTENT_URI, contentValues);
+                    if (uri != null)
+                        KLog.d(uri.toString());
+                    btFav.setText(R.string.remove_favourite);
+                    break;
+                }else {
+                    String where = FavMoviesDbHelper.COLUMN_TMDB_ID + " = ?";
+                    String[] whereArgs = new String[]{movie.getId()};
+                    getContentResolver().delete(FavContract.Fav.CONTENT_URI, where, whereArgs);
+                    btFav.setText(R.string.mark_as_favourite);
+                }
                 break;
         }
     }

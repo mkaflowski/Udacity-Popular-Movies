@@ -99,7 +99,7 @@
                             android:id="@+id/btFav"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Mark as favourite"
+                            android:text="@string/mark_as_favourite"
                             android:textSize="12sp" />
                     </LinearLayout>
                 </LinearLayout>

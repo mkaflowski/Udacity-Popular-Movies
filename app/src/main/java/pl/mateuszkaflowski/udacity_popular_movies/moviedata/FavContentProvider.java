@@ -3,7 +3,6 @@ package pl.mateuszkaflowski.udacity_popular_movies.moviedata;
 import android.content.ContentProvider;
 import android.content.ContentUris;
 import android.content.ContentValues;
-import android.content.Context;
 import android.content.UriMatcher;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -98,7 +97,19 @@ public class FavContentProvider extends ContentProvider {
 
     @Override
     public int delete(@NonNull Uri uri, @Nullable String selection, @Nullable String[] selectionArgs) {
-        return 0;
+        final SQLiteDatabase db = dbHelper.getWritableDatabase();
+        int match = uriMatcher.match(uri);
+
+        int id = 0;
+        switch (match) {
+            case MOVIES:
+                id = db.delete(FavMoviesDbHelper.TABLE_FAV, selection,selectionArgs);
+                break;
+        }
+
+        getContext().getContentResolver().notifyChange(uri,null);
+
+        return id;
     }
 
     @Override
