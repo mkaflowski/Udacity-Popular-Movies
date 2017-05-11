@@ -43,7 +43,7 @@ public class FavContentProvider extends ContentProvider {
         switch (uriMatcher.match(uri)) {
             case MOVIES:
                 returnCursor = db.query(
-                        FavMoviesDbHelper.TABLE_FAV,
+                        FavContract.Fav.TABLE_FAV,
                         projection,
                         selection,
                         selectionArgs,
@@ -80,7 +80,7 @@ public class FavContentProvider extends ContentProvider {
         Uri returnUri = null;
         switch (match) {
             case MOVIES:
-                long id = db.insert(FavMoviesDbHelper.TABLE_FAV, null, values);
+                long id = db.insert(FavContract.Fav.TABLE_FAV, null, values);
                 if (id > 0) {
                     //success
                     returnUri = ContentUris.withAppendedId(FavContract.Fav.CONTENT_URI, id);
@@ -103,7 +103,7 @@ public class FavContentProvider extends ContentProvider {
         int id = 0;
         switch (match) {
             case MOVIES:
-                id = db.delete(FavMoviesDbHelper.TABLE_FAV, selection,selectionArgs);
+                id = db.delete(FavContract.Fav.TABLE_FAV, selection,selectionArgs);
                 break;
         }
 

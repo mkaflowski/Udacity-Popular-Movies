@@ -2,9 +2,7 @@ package pl.mateuszkaflowski.udacity_popular_movies;
 
 import android.content.Intent;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteOpenHelper;
 import android.support.v4.app.LoaderManager;
-import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
@@ -22,7 +20,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import pl.mateuszkaflowski.udacity_popular_movies.moviedata.FavContract;
-import pl.mateuszkaflowski.udacity_popular_movies.moviedata.FavDataSource;
 import pl.mateuszkaflowski.udacity_popular_movies.moviedata.FavMoviesDbHelper;
 import pl.mateuszkaflowski.udacity_popular_movies.moviedata.Movie;
 
@@ -110,7 +107,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Clic
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        return new CursorLoader(this, FavContract.Fav.CONTENT_URI, FavDataSource.allColumns, null, null, FavMoviesDbHelper.COLUMN_ID);
+        return new CursorLoader(this, FavContract.Fav.CONTENT_URI, FavContract.Fav.allColumns, null, null, FavContract.Fav._ID);
     }
 
     @Override

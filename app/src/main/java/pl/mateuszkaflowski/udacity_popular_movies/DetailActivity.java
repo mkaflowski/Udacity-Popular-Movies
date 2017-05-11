@@ -31,8 +31,6 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import pl.mateuszkaflowski.udacity_popular_movies.moviedata.FavContract;
-import pl.mateuszkaflowski.udacity_popular_movies.moviedata.FavDataSource;
-import pl.mateuszkaflowski.udacity_popular_movies.moviedata.FavMoviesDbHelper;
 import pl.mateuszkaflowski.udacity_popular_movies.moviedata.Movie;
 import pl.mateuszkaflowski.udacity_popular_movies.moviedata.MovieCollector;
 import pl.mateuszkaflowski.udacity_popular_movies.moviedata.Review;
@@ -102,9 +100,9 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
 
         btFav.setOnClickListener(this);
 
-        String where = FavMoviesDbHelper.COLUMN_TMDB_ID + " = ?";
+        String where = FavContract.Fav.COLUMN_TMDB_ID + " = ?";
         String[] whereArgs = new String[]{movie.getId()};
-        Cursor cursor = getContentResolver().query(FavContract.Fav.CONTENT_URI, FavDataSource.allColumns, where, whereArgs, null);
+        Cursor cursor = getContentResolver().query(FavContract.Fav.CONTENT_URI, FavContract.Fav.allColumns, where, whereArgs, null);
         if (cursor.getCount() > 0)
             isFavourite = true;
 
@@ -194,12 +192,12 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
                 if(!isFavourite) {
                     KLog.d("Adding to database");
                     ContentValues contentValues = new ContentValues();
-                    contentValues.put(FavMoviesDbHelper.COLUMN_TITLE, movie.getOriginalTitle());
-                    contentValues.put(FavMoviesDbHelper.COLUMN_TMDB_ID, movie.getId());
-                    contentValues.put(FavMoviesDbHelper.COLUMN_DATE, movie.getReleaseDate());
-                    contentValues.put(FavMoviesDbHelper.COLUMN_OVERVIEW, movie.getOverview());
-                    contentValues.put(FavMoviesDbHelper.COLUMN_POSTER, movie.getPosterImageUrl());
-                    contentValues.put(FavMoviesDbHelper.COLUMN_RATING, movie.getUserRating());
+                    contentValues.put(FavContract.Fav.COLUMN_TITLE, movie.getOriginalTitle());
+                    contentValues.put(FavContract.Fav.COLUMN_TMDB_ID, movie.getId());
+                    contentValues.put(FavContract.Fav.COLUMN_DATE, movie.getReleaseDate());
+                    contentValues.put(FavContract.Fav.COLUMN_OVERVIEW, movie.getOverview());
+                    contentValues.put(FavContract.Fav.COLUMN_POSTER, movie.getPosterImageUrl());
+                    contentValues.put(FavContract.Fav.COLUMN_RATING, movie.getUserRating());
 
                     Uri uri = getContentResolver().insert(FavContract.Fav.CONTENT_URI, contentValues);
                     if (uri != null)
@@ -207,7 +205,7 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
                     btFav.setText(R.string.remove_favourite);
                     break;
                 }else {
-                    String where = FavMoviesDbHelper.COLUMN_TMDB_ID + " = ?";
+                    String where = FavContract.Fav.COLUMN_TMDB_ID + " = ?";
                     String[] whereArgs = new String[]{movie.getId()};
                     getContentResolver().delete(FavContract.Fav.CONTENT_URI, where, whereArgs);
                     btFav.setText(R.string.mark_as_favourite);
